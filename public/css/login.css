@@ -1,0 +1,16 @@
+html, body {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #333; 
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.card {
+    width: 300px; 
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+    background-color: #fff;
+}

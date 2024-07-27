@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/config.php'; 
+// include __DIR__ . '/../../config/verificaLogin.php';
 
 require_once __DIR__ . '/../../model/usuarioModel.php';
 
@@ -32,7 +33,9 @@ unset($_SESSION['mensagem']);
             <div class="card-body">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">Usuários</h3>
+                    <?php if (isset($_SESSION['access_level']) && $_SESSION['access_level'] === 'admin'): ?>
                     <a href="cadastrarUsuario.php" class="btn btn-success"><i class="bi bi-person-plus-fill"></i> Cadastrar</a>
+                    <?php endif; ?>
                 </div>
                 <?php if ($mensagem): ?>
                     <div id="alert" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -45,7 +48,10 @@ unset($_SESSION['mensagem']);
                             <th>Nome</th>
                             <th>Email</th>
                             <th>Nível de Acesso</th>
+                            <?php if (isset($_SESSION['access_level']) && $_SESSION['access_level'] === 'admin'): ?>
                             <th>#</th>
+                            <?php endif; ?>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -65,17 +71,23 @@ unset($_SESSION['mensagem']);
                                         }
                                         ?>
                                     </td>
+                                    <?php if (isset($_SESSION['access_level']) && $_SESSION['access_level'] === 'admin'): ?>
                                     <td>
                                         <a href="cadastrarUsuario.php/<?php echo urlencode($usuario['id']); ?>" class="btn btn-primary">
                                     <i class="bi bi-pencil"></i></a>
                                     <a href="/desafio_php_junior/controllers/usuario.php?acao=apagarUsuario&id=<?php echo urlencode($usuario['id']); ?>" class="btn btn-danger">
                                     <i class="bi bi-trash"></i></a>
                                     </td>
+                                    <?php endif; ?>
+
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
                 </table>
+                <div class="d-flex justify-content-end">
+                    <a href="/desafio_php_junior/views/home.php" class="btn btn-secondary">Voltar</a>
+                </div>
             </div>
         </div>
     </div>

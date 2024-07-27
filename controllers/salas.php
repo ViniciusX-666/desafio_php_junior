@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../model/salasModel.php';
+include __DIR__ . '/../../config/verificaLogin.php';
 
 class SalasController {
-
     private $salaModel;
     private $db;
     private $banco;
@@ -25,9 +25,9 @@ class SalasController {
     
     public function cadastrarSalas() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nome = $_POST['name'];
-            $capacidade = $_POST['capacity'];
-            $locacao = $_POST['location'];
+            $nome = trim($_POST['name']);
+            $capacidade = trim($_POST['capacity']);
+            $locacao = trim($_POST['location']);
 
             if (!empty($nome) && !empty($capacidade) && !empty($locacao)) {
                 $dados = [
@@ -38,12 +38,12 @@ class SalasController {
 
                 $this->salaModel->cadastrarSalas($dados);
 
-                
+                session_start();
                 $_SESSION['mensagem'] = 'Sala cadastrada com sucesso!';
                 header('Location: /desafio_php_junior/views/Salas/listarSalas.php');
                 exit();
             } else {
-                
+                session_start();
                 $_SESSION['mensagem'] = 'Todos os campos são obrigatórios.';
                 header('Location: /desafio_php_junior/views/Salas/cadastrarSalas.php');
                 exit();
@@ -53,6 +53,48 @@ class SalasController {
 
     public function buscarTodasSalas() {
         return $this->salaModel->buscarTodos();
+    }
+
+    public function editarSalas() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+            $id = intval($_POST['id'] ?? 0);
+            $nome = trim($_POST['name'] ?? '');
+            $capacidade = intval($_POST['capacity'] ?? 0);
+            $locacao = trim($_POST['location'] ?? '');
+    
+            if ($id > 0 && !empty($nome) && $capacidade > 0) {
+                $dados = [
+                    'name' => $nome,
+                    'capacity' => $capacidade,
+                    'location' => $locacao,
+                ];
+    
+                $this->salaModel->editar($id, $dados);
+                $_SESSION['mensagem'] = 'Cadastro da sala editado com sucesso!';
+            } else {
+                $_SESSION['mensagem'] = 'Todos os campos são obrigatórios.';
+            }
+    
+            header('Location: /desafio_php_junior/views/Salas/listarSalas.php');
+            exit();
+        }
+    }
+
+    public function apagarSalas(){
+        if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+            $id = intval($_GET['id']);
+             $excluiu = $this->salaModel->excluir($id);
+            session_start();
+            if($excluiu){
+                $_SESSION['mensagem'] = 'Sala excluída com sucesso';
+            }else{
+                $_SESSION['mensagem'] = 'Não foi possível excluir sala';
+            }
+            
+            header('Location: /desafio_php_junior/views/Salas/listarSalas.php');
+            exit();
+        }
     }
 }
 

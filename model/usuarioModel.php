@@ -7,7 +7,7 @@ class UsuarioModel {
     }
 
     public function autenticar($dados) {
-        $sql = "SELECT * FROM users WHERE email = :email AND password = :senha";
+        $sql = "SELECT * FROM users WHERE email = :email AND password = :password";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':email', $dados['email']);
         $stmt->bindParam(':password', $dados['senha']);

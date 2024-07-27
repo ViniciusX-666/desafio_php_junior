@@ -1,7 +1,8 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../model/usuarioModel.php';
-require_once __DIR__ . '/../../config/config.php'; 
+require_once __DIR__ . '/../config/config.php'; 
+// include __DIR__ . '/../../config/verificaLogin.php';
 
 
 class UsuarioController {
@@ -10,6 +11,7 @@ class UsuarioController {
     private $banco;
 
     public function __construct() {
+        $this->verificaLogin();
         $this->banco = new BancoDados();
         $this->db = $this->banco->ConectarBanco();
         $this->usuarioModel = new UsuarioModel($this->db);
@@ -25,17 +27,9 @@ class UsuarioController {
     }
 
     public function autenticar() {
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
             $senha = trim($_POST['password']);
-
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                die('Email inválido.');
-            }
-
-            if (empty($senha)) {
-                die('Senha é obrigatória.');
-            }
 
             $dados = [
                 'email' => $email,
@@ -45,8 +39,15 @@ class UsuarioController {
             $usuario = $this->usuarioModel->autenticar($dados);
 
             if ($usuario) {
-                echo "Login bem-sucedido!";
+                session_start();
+                $_SESSION['usuario_id'] = $usuario['id']; 
+                $_SESSION['usuario_nome'] = $usuario['name']; 
+                $_SESSION['access_level'] = $usuario['access_level']; 
+                
+                header('Location: /desafio_php_junior/views/home.php');
+                exit();
             } else {
+                // Retorna uma mensagem de erro
                 echo "Email ou senha incorretos.";
             }
         }
@@ -122,12 +123,13 @@ class UsuarioController {
                 } else {
                     
                     $_SESSION['mensagem'] = 'Todos os campos são obrigatórios.';
-                    header('Location: /desafio_php_junior/views/Usuarios/cadastrarUsuario.php');
+                    header('Location: /desafio_php_junior/views/Usuarios/cadastrarUsuario.php/'.$id);
+
                     exit();
                 }
                 
             } else {
-                header('Location: /desafio_php_junior/views/Usuarios/cadastrarUsuario.php/'.$id);
+                header('Location: /desafio_php_junior/views/Usuarios/cadastrarUsuario.php');
             }
         } else {
             die('Método de requisição inválido.');
@@ -155,6 +157,25 @@ class UsuarioController {
         $usuarios = $this->usuarioModel->buscarTodos();
         return $usuarios;
     }
+
+    private function verificaLogin(){
+
+        $URL_ATUAL= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $URL_COMPARAR ="/controllers/usuario.php?acao=autenticar";
+
+        $pos = strpos($URL_ATUAL, '/controllers');
+        $compara = substr($URL_ATUAL, $pos);
+        
+        if (strcmp($compara, $URL_COMPARAR) != 0) {
+
+            if (!isset($_SESSION['usuario_id'])) {
+        
+                header('Location: /desafio_php_junior/views/login.php');
+                exit();
+            }
+        }
+        
+    }
 }
 
 $usuarioController = new UsuarioController();
@@ -179,4 +200,5 @@ if (isset($_GET['acao'])) {
 } else {
     $usuarioController->index();
 }
+ 
 ?>

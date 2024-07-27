@@ -1,27 +1,31 @@
 <?php
-// include __DIR__ . '/../../config/verificaLogin.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/config.php'; 
 
-require_once __DIR__ . '/../../model/salasModel.php';
-
+require_once __DIR__ . '/../../model/reservasModel.php';
 
 $banco = new BancoDados();
 $db = $banco->ConectarBanco();
-$salasModel = new SalasModel($db);
+$reservasModel = new ReservasModel($db);
 
-$salas = $salasModel->buscarTodos();
+$reservas = $reservasModel->buscarTodos();
 
 $mensagem = $_SESSION['mensagem'] ?? '';
 unset($_SESSION['mensagem']);
-?>
 
+function formatarData($data) {
+    $dateTime = new DateTime($data);
+    return $dateTime->format('d/m/Y H:i');
+}
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listar Salas</title>
+    <title>Listar Reservas</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="../../public/css/salaLista.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -32,11 +36,8 @@ unset($_SESSION['mensagem']);
         <div class="card">
             <div class="card-body">
                 <div class="card-body d-flex justify-content-between align-items-center">
-                    <h3 class="mb-0">Salas</h3>
-                    <?php if (isset($_SESSION['access_level']) && $_SESSION['access_level'] === 'admin'): ?>
-                    <a href="cadastrarSalas.php" class="btn btn-success"><i class="bi bi-person-plus-fill"></i> Cadastrar</a>
-                    <?php endif; ?>
-
+                    <h3 class="mb-0">Reservas</h3>
+                    <a href="cadastrarReservas.php" class="btn btn-success"><i class="bi bi-person-plus-fill"></i> Cadastrar</a>
                 </div>
                 <?php if ($mensagem): ?>
                     <div id="alert" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -49,36 +50,30 @@ unset($_SESSION['mensagem']);
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Nome</th>
-                            <th>Capacidade</th>
-                            <th>Locação</th>
-                            <?php if (isset($_SESSION['access_level']) && $_SESSION['access_level'] === 'admin'): ?>
+                            <th>Usuário</th>
+                            <th>Sala</th>
+                            <th>De</th>
+                            <th>Até</th>
                             <th>Ação</th>
-                            <?php endif; ?>
-
-
                         </tr>
                     </thead>
                     <tbody>
-                    <?php if (empty($salas)): ?>
+                    <?php if (empty($reservas)): ?>
                             <tr>
-                                <td colspan="4" class="text-center">Nenhuma sala encontrada.</td>
+                                <td colspan="5" class="text-center">Nenhuma reserva encontrada.</td>
                             </tr>
                         <?php else: ?>
-                            <?php foreach ($salas as $sala): ?>
+                            <?php foreach ($reservas as $reserva): ?>
                                 <tr>
-                                    <td><?php echo $sala['name']; ?></td>
-                                    <td><?php echo $sala['capacity']; ?></td>
-                                    <td><?php echo $sala['location']; ?></td>
-                                    <?php if (isset($_SESSION['access_level']) && $_SESSION['access_level'] === 'admin'): ?>
+                                    <td><?php echo $reserva['nomeUsuario']; ?></td>
+                                    <td><?php echo $reserva['nomeSala']; ?></td>
+                                    <td><?php echo formatarData($reserva['dataInicio']); ?></td>
+                                    <td><?php echo formatarData($reserva['dataFim']);?></td>
                                     <td>
-                                        <a href="cadastrarSalas.php/<?php echo urlencode($sala['id']); ?>" class="btn btn-primary"><i class="bi bi-pencil"></i></a>
-                                        <a href="/desafio_php_junior/controllers/salas.php?acao=apagarSalas&id=<?php echo urlencode($sala['id']); ?>" class="btn btn-danger">
+                                        <a href="cadastrarReservas.php/<?php echo urlencode($reserva['id']); ?>" class="btn btn-primary"><i class="bi bi-pencil"></i></a>
+                                        <a href="/desafio_php_junior/controllers/reservas.php?acao=apagarReservas&id=<?php echo urlencode($reserva['id']); ?>" class="btn btn-danger">
                                             <i class="bi bi-trash"></i>
                                         </a>
-                                    </td>
-                                    <?php endif; ?>
-
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

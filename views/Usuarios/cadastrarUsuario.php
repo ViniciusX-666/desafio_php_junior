@@ -34,7 +34,7 @@ unset($_SESSION['mensagem']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $id ? 'Editar Usuário' : 'Cadastrar Usuário'; ?></title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../public/css/usuario.css">
+    <link rel="stylesheet" href="/desafio_php_junior/public/css/usuario.css?v=1.0">
     <link rel="stylesheet" href="../../public/js/usuarioValidation.js">
 </head>
 <body>
@@ -77,10 +77,12 @@ unset($_SESSION['mensagem']);
                     </div>
                     <div class="form-group">
                         <label for="password">Senha:</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Senha">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Senha" value="<?php echo htmlspecialchars($usuario[0]['password'] ?? ''); ?>">
                     </div>
-                    <div class="d-flex justify-content-center">
-                        <input type="hidden" name="registerUser" value="1">
+                    <div class="d-flex justify-content-between">
+                    <a href="/desafio_php_junior/views/Usuarios/listarUsuarios.php" class="btn btn-secondary">Voltar</a>
+
+                    <input type="hidden" name="registerUser" value="1">
                         <button type="submit" class="btn btn-primary"><?php echo $id ? 'Atualizar' : 'Cadastrar'; ?></button>
                     </div>
                 </form>

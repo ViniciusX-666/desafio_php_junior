@@ -16,7 +16,7 @@
         <div class="card">
             <div class="card-body">
                 <h3>Login de acesso</h3>
-                <form id="loginForm" action="usuario.php" method="post">                    
+                <form id="loginForm" action="/desafio_php_junior/controllers/usuario.php?acao=autenticar" method="post">                    
                     <div class="form-group">
                         <label for="email">Email:</label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="Email">

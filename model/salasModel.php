@@ -9,18 +9,15 @@ class SalasModel {
     //Create
     public function cadastrarSalas($dados) {
         
-        $sql = "INSERT INTO rooms  (name, capacity , location) VALUES (:name, :capacidade, :locacao)";
+        $sql = "INSERT INTO rooms  (name, capacity , location) VALUES (:nome, :capacidade, :locacao)";
         $stmt = $this->pdo->prepare($sql);
     
-        $stmt->bindParam(':name', $dados['nome']);
+        $stmt->bindParam(':nome', $dados['nome']);
         $stmt->bindParam(':capacidade', $dados['capacidade']);
         $stmt->bindParam(':locacao', $dados['locacao']);        
     
-        if ($stmt->execute()) {
-            return true;
-        } else {
-            return false;
-        }
+        return $stmt->execute();
+ 
     }
 
     //Read
@@ -31,6 +28,15 @@ class SalasModel {
         
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function buscarPorId($id){
+        $sql = "SELECT * FROM rooms where id=:id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id', $id);
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     //Update

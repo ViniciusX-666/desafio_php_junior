@@ -1,48 +1,78 @@
 <?php
-require_once '../config/database.php';
-require_once '../model/salasModel.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../model/salasModel.php';
 
 class SalasController {
 
-    private $salasModel;
+    private $salaModel;
+    private $db;
+    private $banco;
 
-    public function __construct($pdo) {
-        $this->salasModel = new SalasModel($pdo);
+    public function __construct() {
+        $this->banco = new BancoDados();
+        $this->db = $this->banco->ConectarBanco();
+        $this->salaModel = new SalasModel($this->db);
     }
 
+    public function __destruct() {
+        $this->banco->fecharConexao();
+    }
+
+    public function index() {
+        $salas = $this->salaModel->buscarTodos();
+        include __DIR__ . '/../views/Salas/listarSalas.php';
+    }
     
     public function cadastrarSalas() {
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['registerRoom'])) {
-            $nome = trim($_POST['name']);
-            $capacidade = $_POST['capacity '];
-            $locacao = $_POST['location '];           
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $nome = $_POST['name'];
+            $capacidade = $_POST['capacity'];
+            $locacao = $_POST['location'];
 
-            $dados = [
-                'nome' => $nome,
-                'capacidade' => $capacidade,
-                'locacao' => $locacao,               
-            ];
+            if (!empty($nome) && !empty($capacidade) && !empty($locacao)) {
+                $dados = [
+                    'nome' => $nome,
+                    'capacidade' => $capacidade,
+                    'locacao' => $locacao,
+                ];
 
-            $salas = $this->salasModel->cadastrarSalas($dados);
+                $this->salaModel->cadastrarSalas($dados);
 
-            if ($salas) {
-                echo "Cadastro bem-sucedido!";
+                
+                $_SESSION['mensagem'] = 'Sala cadastrada com sucesso!';
+                header('Location: /desafio_php_junior/views/Salas/listarSalas.php');
+                exit();
             } else {
-                echo "Erro ao cadastrar usuário.";
+                
+                $_SESSION['mensagem'] = 'Todos os campos são obrigatórios.';
+                header('Location: /desafio_php_junior/views/Salas/cadastrarSalas.php');
+                exit();
             }
         }
     }
 
-    public function buscarTodasSalas(){
-
-        $buscou = $this->salasModel->buscarTodos();
+    public function buscarTodasSalas() {
+        return $this->salaModel->buscarTodos();
     }
 }
 
-$pdo = include('../config/database.php');
-$salasController = new SalasController($pdo);
-
-if (isset($_POST['registerRoom'])) {
-    $salasController->cadastrarSalas();
-} 
+$salasController = new SalasController();
+if (isset($_GET['acao'])) {
+    switch ($_GET['acao']) {
+        case 'cadastrarSalas':
+            $salasController->cadastrarSalas();
+            break;
+        case 'editarSalas':
+            $salasController->editarSalas();
+            break;
+        case 'apagarSalas':
+            $salasController->apagarSalas();
+            break;
+        default:
+            $salasController->index();
+            break;
+    }
+} else {
+    $salasController->index();
+}
 ?>

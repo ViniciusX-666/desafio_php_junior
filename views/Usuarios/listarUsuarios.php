@@ -4,7 +4,13 @@ require_once __DIR__ . '/../../config/config.php';
 // include __DIR__ . '/../../config/verificaLogin.php';
 
 require_once __DIR__ . '/../../model/usuarioModel.php';
-
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+if (!isset($_SESSION['usuario_id'])) {
+    header('Location: /desafio_php_junior/views/login.php');
+    exit();
+}
 $banco = new BancoDados();
 $db = $banco->ConectarBanco();
 $usuarioModel = new UsuarioModel($db);
